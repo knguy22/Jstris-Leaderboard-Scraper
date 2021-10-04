@@ -3,6 +3,7 @@ import stats_gather
 import stats_sorter
 
 if __name__ == '__main__':
+    
     # gathers list of usernames; saves usernames for later if not already there in unorderedname.txt
 
     listofusernames = username_init.username_init()
@@ -11,7 +12,7 @@ if __name__ == '__main__':
 
     stats_gather.stats_gather(listofusernames)
 
-    # gather list of blocks from each stats part
+    # gather list of blocks from each stats for each player; outputs sorted stats to "orderedstats.txt" 
 
     stats_sorter.stats_sorter()
 
