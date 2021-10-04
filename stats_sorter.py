@@ -82,14 +82,48 @@ def write_stats_to_file(listofblockruns, listofusernames):
     for i in listofblockruns:
         sortedlistofusernames.append(listofusernames[i[2]])
 
+
+    # convert to csv
+
+    sortedlistofusernames = statsformattocsv(sortedlistofusernames)
+
+
     # encode for text
 
     c = 0
     while len(sortedlistofusernames) - c > 0:
-        sortedlistofusernames[c] = str(c + 1) + ". " + sortedlistofusernames[c] + "\n"
         sortedlistofusernames[c] = sortedlistofusernames[c].encode("utf8")
         c += 1
 
+
     # write text to final document
-    with open("orderedstats.txt", "wb") as f:
+    with open("orderedstats.csv", "wb") as f:
         f.writelines(sortedlistofusernames)
+
+def statsformattocsv(sortedlistofusernames):
+    # input
+    # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
+
+    # output
+    # 9747.,Shenanigans,44:30.45,2155,0.81,4692,2020-05-24 00:16:44,https://jstris.jezevec10.com/replay/15847946
+    csvlistofusernames = []
+    currentcsvusername = ""
+
+    csvlistofusernames.append("Ranking,Username,Time,Blocks,PPS,Finesse,Date,Link\n")
+    csvlistofusernames.append("\n")
+
+
+    c = 1
+    for i in sortedlistofusernames:
+        currentcsvusername = i
+        currentcsvusername = str(c) + ".," + currentcsvusername
+        c += 1
+        currentcsvusername = currentcsvusername.replace("  Time: ", ",")
+        currentcsvusername = currentcsvusername.replace("  Blocks: ", ",")
+        currentcsvusername = currentcsvusername.replace("  PPS: ", ",")
+        currentcsvusername = currentcsvusername.replace("  Finesse: ", ",")
+        currentcsvusername = currentcsvusername.replace("  Date: ", ",")
+        currentcsvusername = currentcsvusername.replace("  Link: ", ",")
+        currentcsvusername += "\n"
+        csvlistofusernames.append((currentcsvusername))
+    return csvlistofusernames
