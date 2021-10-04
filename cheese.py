@@ -4,14 +4,14 @@ import io
 
 # Grabs all files from internet
 class filegrab:
-    def cheesefile(url):
+    def cheese_file(url):
         # cheese.txt is how all of the cheese page's data will be stored
         r = requests.get(url)
         filename = open("cheese.txt", "w", encoding="utf-8")
         filename.write(r.text)
         filename.close()
 
-    def leaderboardsfile(game, mode, offset, writeorappend):
+    def leaderboards_file(game, mode, offset, writeorappend):
         # game:
         # 1 = sprint, 3 = cheese, 4 = survival, 5 = ultra
 
@@ -34,7 +34,7 @@ class filegrab:
 
 
 # Interprets json to txt formatting to get the stats we want
-class cheesestatsinterpreter:
+class cheese_stats_interpreter:
 
     #Everything below will return an integer/float except for the date, link and timestring, which return a string
 
@@ -62,7 +62,7 @@ class cheesestatsinterpreter:
 
         return (60 * int(minutes) + int(seconds) + 0.001 * int(milliseconds))
     #seconds to clock format
-    def timereverse(timefloat):
+    def time_reverse(timefloat):
         minutes = int(timefloat // 60)
         seconds = int(timefloat - 60 * minutes // 1)
         milliseconds = round(timefloat - (60 * minutes) - seconds,3)
@@ -131,17 +131,17 @@ class cheesestatsinterpreter:
 
 # The following 3 classes are the bulk of the program;
 
-# usernameinit checks if we want to scrape the jstris api leaderboards and outputs a list of usernames
+# username_init checks if we want to scrape the jstris api leaderboards and outputs a list of usernames
 # the usernames are stored in "unorderedname.txt"
-class usernameinit:
-    def allnamesleaderboards(game, mode):
+class username_init:
+    def all_names_leaderboards(game, mode):
         currentfirstposition = -500
         nextfirstposition = 0
         listofusernames = []
 
         while nextfirstposition == currentfirstposition + 500:
 
-            filegrab.leaderboardsfile(game=game, mode=mode, offset=str(nextfirstposition), writeorappend="w")
+            filegrab.leaderboards_file(game=game, mode=mode, offset=str(nextfirstposition), writeorappend="w")
             currentfirstposition = nextfirstposition
 
             with open("leaderboard.txt", "r") as filename:
@@ -168,7 +168,7 @@ class usernameinit:
                     listofstuff = listofstuff[endbracket + 2:]
                 a = 0
         return listofusernames
-    def usernameinit():
+    def username_init():
         # Getting usernames needed
 
         conditiongetusernames = False
@@ -183,7 +183,7 @@ class usernameinit:
         # gather usernames if file is empty; if already have username, gather usernames from file
 
         if conditiongetusernames == True:
-            listofusernames = usernameinit.allnamesleaderboards(game="3", mode="3")
+            listofusernames = username_init.all_names_leaderboards(game="3", mode="3")
             with open("unorderedname.txt", "w") as filename:
                 filename.writelines(listofusernames)
         else:
@@ -203,17 +203,17 @@ class usernameinit:
 
         return listofusernames
 
-# statsgather takes that list of usernames and for each username
+# stats_gather takes that list of usernames and for each username
 # finds the lowest block run with the replay's corresponding stats and link
 # all of these things are stored in "unorderedstats.txt"
-class statsgather:
-    def lasttimeinpage():
+class stats_gather:
+    def last_time_in_page():
 
         # returns integers
 
         with open("cheese.txt", "r", encoding="utf8") as filename:
 
-            # set up stuff, get the file from cheesefile
+            # set up stuff, get the file from cheese_file
 
             listofstuff = filename.readlines()
             c = 0
@@ -229,9 +229,9 @@ class statsgather:
             if lasttimeindex == 0:
                 return 0
             else:
-                return cheesestatsinterpreter.time(listofstuff[lasttimeindex])
+                return cheese_stats_interpreter.time(listofstuff[lasttimeindex])
 
-    def inpage200replaysallstats():
+    def page_200_replays_stats():
 
         # returns integers
 
@@ -250,22 +250,22 @@ class statsgather:
             while len(listofstuff) - c > 0:
                 if "<td><strong>" in listofstuff[c]:
                     currenttime = listofstuff[c]
-                    currenttime = cheesestatsinterpreter.time(currenttime)
+                    currenttime = cheese_stats_interpreter.time(currenttime)
 
                     currentblock = listofstuff[c + 1]
-                    currentblock = cheesestatsinterpreter.blocks(currentblock)
+                    currentblock = cheese_stats_interpreter.blocks(currentblock)
 
                     currentpps = listofstuff[c + 2]
-                    currentpps = cheesestatsinterpreter.pps(currentpps)
+                    currentpps = cheese_stats_interpreter.pps(currentpps)
 
                     currentfinesse = listofstuff[c + 3]
-                    currentfinesse = cheesestatsinterpreter.finesse(currentfinesse)
+                    currentfinesse = cheese_stats_interpreter.finesse(currentfinesse)
 
                     currentdate = listofstuff[c + 4]
-                    currentdate = cheesestatsinterpreter.date(currentdate)
+                    currentdate = cheese_stats_interpreter.date(currentdate)
 
                     currentlink = listofstuff[c + 6]
-                    currentlink = cheesestatsinterpreter.link(currentlink)
+                    currentlink = cheese_stats_interpreter.link(currentlink)
 
                     allcheesestats.append(
                         (currenttime, currentblock, currentpps, currentfinesse, currentdate, currentlink))
@@ -273,7 +273,7 @@ class statsgather:
 
         return allcheesestats
 
-    def leastblocksuser(username):
+    def username_least_blocks(username):
         firstreplay = "0"
         lastreplay = 0
         minblocks = 10000
@@ -282,16 +282,16 @@ class statsgather:
 
             #gets next cheese page
             url = "https://jstris.jezevec10.com/cheese?display=5&user=" + username + "&lines=100L&page=" + firstreplay
-            filegrab.cheesefile(url)
+            filegrab.cheese_file(url)
 
             # checks if there are no replays left by checking if the last replay is identical to the last page's last replay
             lastreplay = firstreplay
-            firstreplay = str(statsgather.lasttimeinpage())
+            firstreplay = str(stats_gather.last_time_in_page())
             if firstreplay == lastreplay or float(firstreplay) < float(lastreplay):
                 break
 
             # scrapes stats from current page
-            currentpageblocks = statsgather.inpage200replaysallstats()
+            currentpageblocks = stats_gather.page_200_replays_stats()
             c = 0
             replayindex = 0
             for i in currentpageblocks:
@@ -302,7 +302,7 @@ class statsgather:
 
         return minstats
 
-    def statsgather(listofusernames):
+    def stats_gather(listofusernames):
         # gathers unordered stats of everyone; saves it for later
 
         with open("unorderedstats.txt", "rb") as filename:
@@ -314,9 +314,9 @@ class statsgather:
                 # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
                 print(currentindex, listofusernames[currentindex])
 
-                currentstats = statsgather.leastblocksuser(listofusernames[currentindex])
+                currentstats = stats_gather.username_least_blocks(listofusernames[currentindex])
                 filename.write(listofusernames[currentindex] + "  ")
-                filename.write("Time: " + cheesestatsinterpreter.timereverse(currentstats[0]) + "  ")
+                filename.write("Time: " + cheese_stats_interpreter.time_reverse(currentstats[0]) + "  ")
                 filename.write("Blocks: " + str(currentstats[1]) + "  ")
                 filename.write("PPS: " + str(currentstats[2]) + "  ")
                 filename.write("Finesse: " + str(currentstats[3]) + "  ")
@@ -324,14 +324,33 @@ class statsgather:
                 filename.write("Link: " + currentstats[5] + " \n")
                 currentindex += 1
 
-# statssorter takes "unorderedstats.txt" and sorts each username for blocks ascending from lowest blocks (ascend
+# stats_sorter takes "unorderedstats.txt" and sorts each username for blocks ascending from lowest blocks (ascend
 # from lowest time if blocks are equal);
 # the ordered usernames are put into "orderedstats.txt"
-class statssorter:
-    def statssorter():
+class stats_sorter:
+    def stats_sorter():
 
         # open the list of unordered least block runs; now have listofusernames
 
+        listofusernames = []
+        listofusernames = stats_sorter.open_unordered_stats()
+
+
+        # extract least block runs, index, and pps in list from each username's string; assigns them to tuple
+        # use least blocks and pps to sort later
+
+        listofblockruns = []
+        listofblockruns = stats_sorter.stats_string_to_blocks(listofusernames)
+        # sorting algorithm
+
+        listofblockruns = stats_sorter.sorting_algorithm(listofblockruns)
+
+        # prepares list of stats from unorderedstatstxt using sorted listofblockruns and writes unorderedstats into
+        # orderedstats.txt
+
+        stats_sorter.write_stats_to_file(listofblockruns, listofusernames)
+
+    def open_unordered_stats():
         with io.open("unorderedstats.txt", encoding='utf-8') as f:
             stringofusernames = f.readlines()
 
@@ -339,22 +358,27 @@ class statssorter:
         for i in stringofusernames:
             listofusernames.append(i.rstrip())
 
-        # extract least block runs, index, and pps in list from each username's string; assigns them to tuple
+        return listofusernames
+
+    def stats_string_to_blocks(listofusernames):
+
         # string format:
         # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
 
-        listofblockruns = []
         c = 0
+        listofblockruns = []
         for i in listofusernames:
             blocksindex = i.index("Blocks: ")
             ppsindex = i.index("PPS: ")
             finesseindex = i.index("Finesse: ")
             listofblockruns.append((int(i[blocksindex + 8: ppsindex - 2]), float(i[ppsindex + 5: finesseindex - 2]), c))
             c += 1
+        return listofblockruns
 
-        # sorting algorithm
+    def sorting_algorithm(listofblockruns):
+        # switches two indexes in a list if the lower index has a higher block count than the higher index
+        # pretty inefficient; will change later
         # e checks if there has been any sorting for each time the entire list is run through
-
         currentblocks = 0
         nextblocks = 0
         e = 1
@@ -375,40 +399,40 @@ class statssorter:
                         e += 1
                 d += 1
 
+        return listofblockruns
+
+    def write_stats_to_file(listofblockruns, listofusernames):
         # final list of strings
-        finallistofblockruns = []
+        sortedlistofusernames = []
         for i in listofblockruns:
-            finallistofblockruns.append(listofusernames[i[2]])
+            sortedlistofusernames.append(listofusernames[i[2]])
 
         # encode for text
 
         c = 0
-        while len(finallistofblockruns) - c > 0:
-            finallistofblockruns[c] = str(c + 1) + ". " + finallistofblockruns[c] + "\n"
-            finallistofblockruns[c] = finallistofblockruns[c].encode("utf8")
+        while len(sortedlistofusernames) - c > 0:
+            sortedlistofusernames[c] = str(c + 1) + ". " + sortedlistofusernames[c] + "\n"
+            sortedlistofusernames[c] = sortedlistofusernames[c].encode("utf8")
             c += 1
 
         # write text to final document
         with open("orderedstats.txt", "wb") as f:
-            f.writelines(finallistofblockruns)
-
-
-
+            f.writelines(sortedlistofusernames)
 
 
 def main():
 
     #gathers list of usernames; saves usernames for later if not already there in unorderedname.txt
 
-    listofusernames = usernameinit.usernameinit()
+    listofusernames = username_init.username_init()
 
     #gets least block runs and respective stats from each player
 
-    statsgather.statsgather(listofusernames)
+    stats_gather.stats_gather(listofusernames)
 
     #gather list of blocks from each stats part
 
-    statssorter.statssorter()
+    stats_sorter.stats_sorter()
 
 
 #To do
