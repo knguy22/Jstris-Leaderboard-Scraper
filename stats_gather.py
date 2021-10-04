@@ -1,16 +1,43 @@
-import cheese_stats_interpreter
-import file_grab
+import stats_interpreter
+import requests
 
 # stats_gather takes that list of usernames and for each username
 # finds the lowest block run with the replay's corresponding stats and link
 # all of these things are stored in "unorderedstats.txt"
+
+def stats_gather(listofusernames):
+    # gathers unordered stats of everyone; saves it for later in unorderedstats.txt
+
+    # checks how much of the stats have been gathered so far; this program is meant to be stopped and run again in
+    # accordance to the user's schedule; all stats scraped so far has been saved
+    with open("unorderedstats.txt", "rb") as filename:
+        listofstats = filename.readlines()
+        currentindex = len(listofstats)
+
+    with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
+        while len(listofusernames) - currentindex > 0:
+
+            # print(currentindex, listofusernames[currentindex])
+
+            # format for each player:
+            # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
+            currentstats = username_least_blocks(listofusernames[currentindex])
+            filename.write(listofusernames[currentindex] + "  ")
+            filename.write("Time: " + stats_interpreter.time_reverse(currentstats[0]) + "  ")
+            filename.write("Blocks: " + str(currentstats[1]) + "  ")
+            filename.write("PPS: " + str(currentstats[2]) + "  ")
+            filename.write("Finesse: " + str(currentstats[3]) + "  ")
+            filename.write("Date: " + currentstats[4] + "  ")
+            filename.write("Link: " + currentstats[5] + " \n")
+            currentindex += 1
+
+
 def last_time_in_page():
 
     # returns integers
+    with open("userleaderboard.txt", "r", encoding="utf8") as filename:
 
-    with open("cheese.txt", "r", encoding="utf8") as filename:
-
-        # set up stuff, get the file from cheese_file
+        # set up stuff, get the file from user_leaderboard_file
 
         listofstuff = filename.readlines()
         c = 0
@@ -26,49 +53,75 @@ def last_time_in_page():
         if lasttimeindex == 0:
             return 0
         else:
-            return cheese_stats_interpreter.time(listofstuff[lasttimeindex])
+            return stats_interpreter.time(listofstuff[lasttimeindex])
 
 def page_200_replays_stats():
 
-    # returns integers
+    # returns integers where there can be integers (Ex: blocks) and returns strings for others( Ex: date)
 
-    with open("cheese.txt", "r", encoding='utf-8') as filename:
-
-        # set up stuff, get the file from top200cheesemaker
+    with open("userleaderboard.txt", "r", encoding='utf-8') as filename:
 
         listofstuff = filename.readlines()
-        allcheesestats = []
-        # currentblock = 0
-        # currentlink = ''
-        c = 0
+        allstats = []
 
         # use the formatting of the time thing to find the line of the blocks, which is right after time taken;
 
+
+        # uses <td><strong>, which is formatting for time, to find where all the other stats are in reference to each
+        # timestamp on page
+
+        # Example format on page (last - is a replay that has been deleted
+        # streasure</a>
+        # </td>
+        # <td><strong>288:57.<span class="time-mil">800</span></strong></td>
+        # <td>1167</td>
+        # <td>0.07</td>
+        # <td>1542</td>
+        # <td>2021-01-07 01:23:52</td>
+        # <td>
+        # -
+
+        c = 0
         while len(listofstuff) - c > 0:
+
             if "<td><strong>" in listofstuff[c]:
                 currenttime = listofstuff[c]
-                currenttime = cheese_stats_interpreter.time(currenttime)
+                currenttime = stats_interpreter.time(currenttime)
 
                 currentblock = listofstuff[c + 1]
-                currentblock = cheese_stats_interpreter.blocks(currentblock)
+                currentblock = stats_interpreter.blocks(currentblock)
 
                 currentpps = listofstuff[c + 2]
-                currentpps = cheese_stats_interpreter.pps(currentpps)
+                currentpps = stats_interpreter.pps(currentpps)
 
                 currentfinesse = listofstuff[c + 3]
-                currentfinesse = cheese_stats_interpreter.finesse(currentfinesse)
+                currentfinesse = stats_interpreter.finesse(currentfinesse)
 
                 currentdate = listofstuff[c + 4]
-                currentdate = cheese_stats_interpreter.date(currentdate)
+                currentdate = stats_interpreter.date(currentdate)
 
                 currentlink = listofstuff[c + 6]
-                currentlink = cheese_stats_interpreter.link(currentlink)
+                currentlink = stats_interpreter.link(currentlink)
 
-                allcheesestats.append(
+                allstats.append(
                     (currenttime, currentblock, currentpps, currentfinesse, currentdate, currentlink))
             c += 1
 
-    return allcheesestats
+    return allstats
+
+
+# Grabs each user's leaderboard page from internet
+def username_leaderboard_file(url):
+    # userleaderboard.txt is how all of the page's data will be stored
+    r = requests.get(url)
+    filename = open("userleaderboard.txt", "w", encoding="utf-8")
+    filename.write(r.text)
+    filename.close()
+
+
+
+# Eventually separate into different class in order to do other things besides grab each user's least blocks
+# Sprint PC runs?
 
 def username_least_blocks(username):
     firstreplay = "0"
@@ -79,7 +132,7 @@ def username_least_blocks(username):
 
         #gets next cheese page
         url = "https://jstris.jezevec10.com/cheese?display=5&user=" + username + "&lines=100L&page=" + firstreplay
-        file_grab.cheese_file(url)
+        username_leaderboard_file(url)
 
         # checks if there are no replays left by checking if the last replay is identical to the last page's last replay
         lastreplay = firstreplay
@@ -98,25 +151,3 @@ def username_least_blocks(username):
             c += 1
 
     return minstats
-
-def stats_gather(listofusernames):
-    # gathers unordered stats of everyone; saves it for later
-
-    with open("unorderedstats.txt", "rb") as filename:
-        listofstats = filename.readlines()
-    with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
-        currentindex = len(listofstats)
-        while len(listofusernames) - currentindex > 0:
-            # format
-            # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
-            print(currentindex, listofusernames[currentindex])
-
-            currentstats = username_least_blocks(listofusernames[currentindex])
-            filename.write(listofusernames[currentindex] + "  ")
-            filename.write("Time: " + cheese_stats_interpreter.time_reverse(currentstats[0]) + "  ")
-            filename.write("Blocks: " + str(currentstats[1]) + "  ")
-            filename.write("PPS: " + str(currentstats[2]) + "  ")
-            filename.write("Finesse: " + str(currentstats[3]) + "  ")
-            filename.write("Date: " + currentstats[4] + "  ")
-            filename.write("Link: " + currentstats[5] + " \n")
-            currentindex += 1

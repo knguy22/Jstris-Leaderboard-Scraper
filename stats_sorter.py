@@ -1,4 +1,5 @@
 import io
+from datetime import date
 
 # stats_sorter takes "unorderedstats.txt" and sorts each username for blocks ascending from lowest blocks (ascend
 # from lowest time if blocks are equal);
@@ -109,6 +110,8 @@ def statsformattocsv(sortedlistofusernames):
     csvlistofusernames = []
     currentcsvusername = ""
 
+    today = date.today()
+    csvlistofusernames.append("This leaderboard was last updated " + today.strftime("%B %d, %Y") + "\n")
     csvlistofusernames.append("Ranking,Username,Time,Blocks,PPS,Finesse,Date,Link\n")
     csvlistofusernames.append("\n")
 
