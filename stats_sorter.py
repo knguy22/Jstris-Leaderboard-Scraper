@@ -115,7 +115,7 @@ def statsformattocsv(sortedlistofusernames):
     currentcsvusername = ""
 
     today = date.today()
-    csvlistofusernames.append("This leaderboard was last updated " + today.strftime("%B %d, %Y") + "\n")
+    csvlistofusernames.append("Last updated:," + today.strftime("%B %d, %Y") + "\n")
     csvlistofusernames.append("Ranking,Username,Time,Blocks,PPS,Finesse,Date,Link\n")
     csvlistofusernames.append("\n")
 
