@@ -140,7 +140,7 @@ def username_least_blocks(username, game, mode):
         elif mode == "4":
             lines = "1000L"
         else:
-            "invalid mode"
+            print("invalid mode")
             return -69
     if game == "3":
         gamemode = "cheese"
@@ -151,7 +151,7 @@ def username_least_blocks(username, game, mode):
         elif mode == "3":
             lines = "100L"
         else:
-            "invalid mode"
+            print("invalid mode")
             return -69
 
     while 1 == 1:
