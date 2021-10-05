@@ -53,7 +53,7 @@ def last_time_in_page():
         if lasttimeindex == 0:
             return 0
         else:
-            return stats_interpreter.time(listofstuff[lasttimeindex])
+            return stats_interpreter.jstris_time(listofstuff[lasttimeindex])
 
 def page_200_replays_stats():
 
@@ -86,7 +86,7 @@ def page_200_replays_stats():
 
             if "<td><strong>" in listofstuff[c]:
                 currenttime = listofstuff[c]
-                currenttime = stats_interpreter.time(currenttime)
+                currenttime = stats_interpreter.jstris_time(currenttime)
 
                 currentblock = listofstuff[c + 1]
                 currentblock = stats_interpreter.blocks(currentblock)

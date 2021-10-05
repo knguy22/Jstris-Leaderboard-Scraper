@@ -1,5 +1,6 @@
 import io
 from datetime import date
+import stats_interpreter
 
 # stats_sorter takes "unorderedstats.txt" and sorts each username for blocks ascending from lowest blocks (ascend
 # from lowest time if blocks are equal);
@@ -19,7 +20,7 @@ def stats_sorter():
     listofblockruns = stats_string_to_blocks(listofusernames)
     # sorting algorithm
 
-    listofblockruns = sorting_algorithm(listofblockruns)
+    listofblockruns = least_blocks_sorting_algorithm(listofblockruns)
 
     # prepares list of stats from unorderedstatstxt using sorted listofblockruns and writes unorderedstats into
     # orderedstats.txt
@@ -44,17 +45,20 @@ def stats_string_to_blocks(listofusernames):
     c = 0
     listofblockruns = []
     for i in listofusernames:
+        timeindex = i.index("Time: ")
         blocksindex = i.index("Blocks: ")
         ppsindex = i.index("PPS: ")
-        finesseindex = i.index("Finesse: ")
-        listofblockruns.append((int(i[blocksindex + 8: ppsindex - 2]), float(i[ppsindex + 5: finesseindex - 2]), c))
+        listofblockruns.append((int(i[blocksindex + 8: ppsindex - 2]),
+                                stats_interpreter.clock_to_seconds(i[timeindex + 6: blocksindex - 2]), c))
         c += 1
+
     return listofblockruns
 
-def sorting_algorithm(listofblockruns):
+def least_blocks_sorting_algorithm(listofblockruns):
     # switches two indexes in a list if the lower index has a higher block count than the higher index
     # pretty inefficient; will change later
     # e checks if there has been any sorting for each time the entire list is run through
+    # i is the number of iterations; is used for bubble sort
     currentblocks = 0
     nextblocks = 0
     e = 1
@@ -68,9 +72,9 @@ def sorting_algorithm(listofblockruns):
             if nextblocks < currentblocks:
                 listofblockruns[d + 1], listofblockruns[d] = listofblockruns[d], listofblockruns[d + 1]
                 e += 1
-            # Compares time if the blocks are the same; higher pps for same blocks means lower time
+            # Compares time if the blocks are the same; lower time is lower number placement on the lsit
             if nextblocks == currentblocks:
-                if listofblockruns[d + 1][1] > listofblockruns[d][1]:
+                if listofblockruns[d + 1][1] < listofblockruns[d][1]:
                     listofblockruns[d + 1], listofblockruns[d] = listofblockruns[d], listofblockruns[d + 1]
                     e += 1
             d += 1
