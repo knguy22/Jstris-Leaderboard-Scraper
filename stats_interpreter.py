@@ -88,7 +88,9 @@ def clock_to_seconds(timestring):
     periodindex = timestring.index(".")
     minutes = int(timestring[ : colonindex])
     seconds = int(timestring[ colonindex + 1: periodindex])
-    milliseconds = float(timestring[ periodindex + 1 : ])
+    milliseconds = float(timestring[ periodindex : ])
+
+    print(timestring, minutes, seconds, milliseconds)
 
     return round(60 * minutes + seconds + milliseconds, 3)
 

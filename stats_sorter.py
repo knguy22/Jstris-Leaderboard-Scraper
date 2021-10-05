@@ -50,14 +50,15 @@ def stats_string_to_blocks(listofusernames):
         ppsindex = i.index("PPS: ")
         listofblockruns.append((int(i[blocksindex + 8: ppsindex - 2]),
                                 stats_interpreter.clock_to_seconds(i[timeindex + 6: blocksindex - 2]), c))
-
         c += 1
+
     return listofblockruns
 
 def least_blocks_sorting_algorithm(listofblockruns):
     # switches two indexes in a list if the lower index has a higher block count than the higher index
     # pretty inefficient; will change later
     # e checks if there has been any sorting for each time the entire list is run through
+    # i is the number of iterations; is used for bubble sort
     currentblocks = 0
     nextblocks = 0
     e = 1
