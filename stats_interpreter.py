@@ -35,11 +35,15 @@ def jstris_time(timestring):
         millisecondsbeg = timestring.index("time-mil") + 10
         millisecondsend = timestring.rindex("</span></strong></td>")
         milliseconds = timestring[millisecondsbeg : millisecondsend]
+        while len(milliseconds) < 3:
+            milliseconds += "0"
         hasmilliseconds = True
     elif "." in timestring and hasminutes == False:
         millisecondsbeg = timestring.index(".") + 1
         millisecondsend = timestring.rindex("</strong></td>")
         milliseconds = timestring[millisecondsbeg : millisecondsend]
+        while len(milliseconds) < 3:
+            milliseconds += "0"
         hasmilliseconds = True
     else:
         milliseconds = "0"
