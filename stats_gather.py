@@ -1,5 +1,6 @@
 import stats_interpreter
 import requests
+import time
 
 # stats_gather takes that list of usernames and for each username
 # finds the lowest block run with the replay's corresponding stats and link
@@ -14,10 +15,41 @@ def stats_gather(listofusernames, game, mode):
         listofstats = filename.readlines()
         currentindex = len(listofstats)
 
+    if game == "3":
+        cheese_least_blocks_stats_gather(listofusernames, game, mode, currentindex)
+    if game == "1":
+        pc_sprint_stats_gather(listofusernames, game, mode, currentindex)
+
+
+def pc_sprint_stats_gather(listofusernames, game, mode, currentindex):
+    with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
+        while len(listofusernames) - currentindex > 0:
+            print(currentindex + 1, listofusernames[currentindex])
+
+            # format for each player:
+            # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
+            currentstats = username_fast_pc_sprint(listofusernames[currentindex], game, mode)
+            if type(currentstats) != bool:
+                filename.write(listofusernames[currentindex] + "  ")
+                filename.write("Time: " + stats_interpreter.time_reverse(currentstats[0]) + "  ")
+                filename.write("Blocks: " + str(currentstats[1]) + "  ")
+                filename.write("PPS: " + str(currentstats[2]) + "  ")
+                filename.write("Finesse: " + str(currentstats[3]) + "  ")
+                filename.write("Date: " + currentstats[4] + "  ")
+                filename.write("Link: " + currentstats[5] + " \n")
+            elif type(currentstats) == bool:
+                filename.write("No pc run;\n")
+            else:
+                raise "error"
+                raise currentstats
+            currentindex += 1
+            time.sleep(5)
+
+def cheese_least_blocks_stats_gather(listofusernames, game, mode, currentindex):
     with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
         while len(listofusernames) - currentindex > 0:
 
-            print(currentindex, listofusernames[currentindex])
+            print(currentindex + 1, listofusernames[currentindex])
 
             # format for each player:
             # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
@@ -30,7 +62,6 @@ def stats_gather(listofusernames, game, mode):
             filename.write("Date: " + currentstats[4] + "  ")
             filename.write("Link: " + currentstats[5] + " \n")
             currentindex += 1
-
 
 def last_time_in_page():
 
@@ -119,28 +150,27 @@ def username_leaderboard_file(url):
     filename.close()
 
 
-
 # Eventually separate into different class in order to do other things besides grab each user's least blocks
 # Sprint PC runs?
 
 def username_least_blocks(username, game, mode):
-    firstreplay = "0"
-    lastreplay = 0
+    current_last_replay = "0"
+    previous_last_replay = 0
     minblocks = 10000
 
     # converts game and mode to their respective strings to search in url
     if game == "1":
         gamemode = "sprint"
-        if mode == "1":
+        if mode == "2":
             lines = "20L"
-        elif mode == "2":
+        elif mode == "1":
             lines = "40L"
         elif mode == "3":
             lines = "100L"
         elif mode == "4":
             lines = "1000L"
         else:
-            print("invalid mode")
+            "invalid mode"
             return -69
     if game == "3":
         gamemode = "cheese"
@@ -151,23 +181,23 @@ def username_least_blocks(username, game, mode):
         elif mode == "3":
             lines = "100L"
         else:
-            print("invalid mode")
+            raise "invalid mode"
             return -69
 
     while 1 == 1:
 
         #gets next cheese page
-        url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + firstreplay
+        url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
         username_leaderboard_file(url)
 
         # checks if there are no replays left by checking if the last replay is identical to the last page's last replay
-        lastreplay = firstreplay
-        firstreplay = str(last_time_in_page())
-        if firstreplay == lastreplay or float(firstreplay) < float(lastreplay):
+        previous_last_replay = current_last_replay
+        current_last_replay = str(last_time_in_page())
+        if current_last_replay == previous_last_replay or float(current_last_replay) < float(previous_last_replay):
             break
 
         # scrapes stats from current page
-        # this works for perfect clear sprints too because slower perfect cleasr finish won't override the faster one
+        # this works for perfect clear sprints too because slower perfect clear finish won't override the faster one
         # which appears in the leaderboard first
         currentpageblocks = page_200_replays_stats()
         c = 0
@@ -179,3 +209,50 @@ def username_least_blocks(username, game, mode):
             c += 1
 
     return minstats
+
+def username_fast_pc_sprint(username, game, mode):
+    current_last_replay = "0"
+    previous_last_replay = 0
+    pcsprint = False
+
+    # converts game and mode to their respective strings to search in url
+    gamemode = "sprint"
+    if mode == "2":
+        lines = "20L"
+    elif mode == "1":
+        lines = "40L"
+    elif mode == "3":
+        lines = "100L"
+    elif mode == "4":
+        lines = "1000L"
+    else:
+        raise "invalid mode"
+        return -69
+
+    while 1 == 1:
+
+        #gets next page
+        url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
+        username_leaderboard_file(url)
+
+        # checks if there are no replays left by checking if the last replay is identical to the last page's last replay
+        previous_last_replay = current_last_replay
+        current_last_replay = str(last_time_in_page())
+        if current_last_replay == previous_last_replay or float(current_last_replay) < float(previous_last_replay):
+            break
+
+        # scrapes stats from current page
+        # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
+        currentpageblocks = page_200_replays_stats()
+        print(time.asctime())
+        c = 0
+        replayindex = 0
+        for i in currentpageblocks:
+            if int(int(lines[:-1]) * 2.5) ==  i[1]:
+                pcsprint = i
+                print("True:", pcsprint)
+                return pcsprint
+            c += 1
+    
+    print(pcsprint)
+    return pcsprint
