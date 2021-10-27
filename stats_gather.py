@@ -25,6 +25,7 @@ def stats_gather(listofusernames, game, mode):
             currentstats = username_pc_sprint(listofusernames[currentindex], game, mode)
         elif game == "3":
             currentstats = username_least_blocks(listofusernames[currentindex], game, mode)
+            
         write_finalstats_to_file(listofusernames[currentindex], currentstats)
 
         currentindex += 1
@@ -143,7 +144,6 @@ def username_least_blocks(username, game, mode):
     current_last_replay = "0"
     previous_last_replay = 0
     minblocks = 10 ** 20
-    minstats = False
 
     # converts game and mode to their respective strings to search in url
     if game == "1":
