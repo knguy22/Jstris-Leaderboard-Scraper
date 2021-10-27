@@ -143,4 +143,23 @@ def link(linkstring):
         linkstring = "-"
     return linkstring
 
+def jstris_score(scorestring):
+    # example
+    # <td><strong>174,325</strong></td>
+
+    scorestring = scorestring[scorestring.index("<td><strong>") + 12 : scorestring.rindex("</strong></td>")]
+    scorestring = scorestring.replace(",","")
+
+    return scorestring
+
+def ppb(ppbstring):
+    # example
+    # <td>379.15</td>
+
+    if ppbstring[0] == " ":
+        ppbstring = ppbstring[1:]
+    ppbstringend = ppbstring.rindex("</td>")
+    ppbstring = float(ppbstring[4:ppbstringend])
+    ppbstring = round(ppbstring,2)
+    return ppbstring
 

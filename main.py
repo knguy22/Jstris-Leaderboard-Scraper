@@ -3,7 +3,6 @@ import stats_gather
 import stats_sorter
 import stats_interpreter
 
-
 def mainfunction():
 
     # game:
@@ -13,8 +12,8 @@ def mainfunction():
     # 1 = 40L/10L, 2 = 20L/18L, 3 = 100L, 4 = 1000L
     # any other gamemode should be 1
 
-    game = "1"
-    mode = "2"
+    game = "3"
+    mode = "3"
 
     # gathers list of usernames; saves usernames for later if not already there in unorderedname.txt
 
@@ -31,5 +30,7 @@ def mainfunction():
 if __name__ == '__main__':
 
 
-    mainfunction()
+    # mainfunction()
 
+    # stats_gather.username_leaderboard_file("https://jstris.jezevec10.com/ultra?display=5&user=fortissim2")
+    print(stats_gather.username_ultra_ppb("zepheniah", "5"))
