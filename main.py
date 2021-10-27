@@ -1,11 +1,8 @@
 import username_init
 import stats_gather
 import stats_sorter
-import math
 import stats_interpreter
-import concurrent.futures
-import requests
-import time
+
 
 def mainfunction():
 
@@ -35,9 +32,4 @@ if __name__ == '__main__':
 
 
     mainfunction()
-    # thing = requests.get("https://gauchospace.ucsb.edu/courses/pluginfile.php/17994618/mod_resource/content/8/Powerpoint%20Five_Who%20is%20a%20Constituionalist_Post.pdf")
-    # data = thing.text
-    # filename = open("leaderboard.txt", "w")
-    # filename.write(data + "\n")
-    # filename.close()
 
