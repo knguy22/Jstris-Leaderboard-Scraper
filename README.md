@@ -1,3 +1,3 @@
-# Cheese Race Scraper
+# Jstris Leaderboard Scraper
 
-Main purpose is to sort the least block runs for each player and display them into a leaderboard. Currently only supports 100L
+The purpose is to be able to form leaderboards for Jstris that aren't currently supported by default on the site. Currently, least block cheese races and fastest pc sprint finishes are supported.
