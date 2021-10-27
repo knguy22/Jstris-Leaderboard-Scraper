@@ -15,10 +15,13 @@ def stats_sorter(game):
 
 
     # cheese least blocks
+
     if game == "3":
         listofblockruns = stats_string_to_blocks(listofusernames)
         listofblockruns = least_blocks_sorting_algorithm(listofblockruns)
-    # pc sprint
+
+    # pc sprint finish
+
     elif game == "1":
         listofpcruns = stats_string_to_pc_sprint(listofusernames)
         listofpcruns = sprint_pc_sorting_algorithm(listofpcruns)
@@ -100,7 +103,7 @@ def stats_string_to_pc_sprint(listofusernames):
     c = 0
     listofpcruns = []
     for i in listofusernames:
-        if ("No pc run" in i) == False:
+        if ("No valid run" in i) == False:
             timeindex = i.index("Time: ")
             blocksindex = i.index("Blocks: ")
             listofpcruns.append((stats_interpreter.clock_to_seconds(i[timeindex + 6: blocksindex - 2]), c))
