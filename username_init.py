@@ -1,5 +1,6 @@
 import io
 import requests
+import os
 
 # username_init checks if we want to scrape the jstris api leaderboards and outputs a list of usernames
 # the usernames are stored in "unorderedname.txt"
@@ -8,6 +9,11 @@ def username_init(game, mode):
     # Checking if the username file is empty
 
     conditiongetusernames = False
+
+    if os.path.exists("unorderedname.txt") == False:
+        f = open("unorderedname.txt", 'x')
+        f.close()
+
     with open("unorderedname.txt", "r") as filename:
         listofusernames = filename.readlines()
         if len(listofusernames) < 1:

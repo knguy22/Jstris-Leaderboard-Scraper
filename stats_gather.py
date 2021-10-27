@@ -1,6 +1,8 @@
 import stats_interpreter
 import requests
 import time
+import os
+
 
 # stats_gather takes that list of usernames and for each username
 # finds desired replay from each user with the replay's corresponding stats and link
@@ -11,6 +13,11 @@ def stats_gather(listofusernames, game, mode):
 
     # checks how much of the stats have been gathered so far; this program is meant to be stopped and run again in
     # accordance to the user's schedule; all stats scraped so far has been saved
+
+    if os.path.exists("unorderedstats.txt") == False:
+        f = open("unorderedstats.txt", 'x')
+        f.close()
+
     with open("unorderedstats.txt", "rb") as filename:
         listofstats = filename.readlines()
         currentindex = len(listofstats)
