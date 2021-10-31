@@ -70,7 +70,7 @@ def all_games_stats_gather(listofusernames, game, mode):
         currentindex += 1
         time.sleep(3)
 
-    file_stuff.duplicate_deleter()
+    # file_stuff.duplicate_deleter()
 
 # Get time value of last replay in page
 def last_time_in_page(game):
@@ -148,19 +148,19 @@ def check_200_replays():
 # Grabs each user's leaderboard page from internet and store in userleaderboard.txt
 
 class file_stuff:
-    def username_leaderboard_file(url):
+    def username_leaderboard_file(url, file_output):
         # userleaderboard.txt is how all of the page's data will be stored
         r = requests.get(url)
-        with open("userleaderboard.txt", "w", encoding="utf-8") as filename:
+        with open(file_output, "w", encoding="utf-8") as filename:
             filename.write(r.text)
             print('request sent')
-        file_stuff.file_treater()
+        file_stuff.file_treater('userleaderboard.txt')
 
-    def file_treater(self):
+    def file_treater(file_output):
 
         # takes file and rewrites it to be more friendly to data handling
 
-        with open('userleaderboard.txt', 'r', encoding='utf-8') as filename:
+        with open(file_output, 'r', encoding='utf-8') as filename:
             listofstuff = filename.readlines()
             c = 0
             total_indices = len(listofstuff)
@@ -173,10 +173,10 @@ class file_stuff:
                     listofstuff[c] = listofstuff[c][1:]
                 c += 1
 
-        with open('userleaderboard.txt', 'w', encoding='utf-8') as filename:
+        with open(file_output, 'w', encoding='utf-8') as filename:
             filename.writelines(listofstuff)
 
-    def duplicate_deleter(self):
+    def duplicate_deleter(file_input):
 
         if os.path.exists("newstats.txt") == False:
             f = open("newstats.txt", 'x')
@@ -188,7 +188,7 @@ class file_stuff:
 
         previous_replay = ''
         non_duplicate_list = []
-        with open('unorderedstats.txt', 'r', encoding='utf-8') as filename:
+        with open(file_input, 'r', encoding='utf-8') as filename:
             c = 0
             while len(filename) - c > 0:
                 current_replay = filename.readline()
@@ -201,8 +201,8 @@ class file_stuff:
                 previous_replay = current_replay
                 c += 1
 
-        os.rename('newstats.txt', 'unorderedstats.txt')
-        os.remove('newstats.txt')
+        os.remove(file_input)
+        os.rename('newstats.txt', file_input)
 
 
 class page_replay_stats:
@@ -238,11 +238,11 @@ class page_replay_stats:
 
             #gets next page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
-            file_stuff.username_leaderboard_file(url)
+            file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
             time.sleep(3)
 
             # adds current page replays to list of all other replays so far
-            allpagesstats.extend(page_replay_stats.page_200_replays_stats())
+            allpagesstats.extend(page_replay_stats.page_200_replays_stats(0))
 
             # checks if there are no pages left
             if check_200_replays() == False:
@@ -402,10 +402,10 @@ class username_best_replay:
 
             # gets next cheese page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
-            file_stuff.username_leaderboard_file(url)
+            file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
 
             # Searches if there is a new least blocks
-            currentpageblocks = page_replay_stats.page_200_replays_stats()
+            currentpageblocks = page_replay_stats.page_200_replays_stats(0)
             c = 0
             for i in currentpageblocks:
                 if minblocks > i[1]:
@@ -445,12 +445,12 @@ class username_best_replay:
 
             # gets next page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
-            file_stuff.username_leaderboard_file(url)
+            file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
             time.sleep(3)
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
-            currentpageblocks = page_replay_stats.page_200_replays_stats()
+            currentpageblocks = page_replay_stats.page_200_replays_stats(0)
             for i in currentpageblocks:
                 if int(int(lines[:-1]) * 2.5) == i[1]:
                     pcsprint = i
@@ -481,12 +481,12 @@ class username_best_replay:
 
             # gets current page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&page=" + current_last_replay
-            file_stuff.username_leaderboard_file(url)
+            file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
             time.sleep(3)
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
-            currentpageppb = page_replay_stats.ultra_page_200_replays_stats()
+            currentpageppb = page_replay_stats.ultra_page_200_replays_stats(0)
             for i in currentpageppb:
                 if i[2] > maxppb:
                     print(i)
