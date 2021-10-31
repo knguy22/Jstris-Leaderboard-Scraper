@@ -242,7 +242,7 @@ class page_replay_stats:
             time.sleep(3)
 
             # adds current page replays to list of all other replays so far
-            allpagesstats.extend(page_replay_stats.page_200_replays_stats(0))
+            allpagesstats.extend(page_replay_stats.page_200_replays_stats('userleaderboard.txt'))
 
             # checks if there are no pages left
             if check_200_replays() == False:
@@ -256,11 +256,11 @@ class page_replay_stats:
 
 
     # Convert 200 replay data in userleaderboard.txt into list of tuple of stats
-    def page_200_replays_stats(parameter):
+    def page_200_replays_stats(file_input):
 
         # returns integers where there can be integers (Ex: blocks) and returns strings for others( Ex: date)
 
-        with open("userleaderboard.txt", "r", encoding='utf-8') as filename:
+        with open(file_input, "r", encoding='utf-8') as filename:
 
             listofstuff = filename.readlines()
             allstats = []
@@ -310,11 +310,11 @@ class page_replay_stats:
 
         return allstats
 
-    def ultra_page_200_replays_stats(parameter):
+    def ultra_page_200_replays_stats(file_input):
 
         # returns integers where there can be integers (Ex: blocks) and returns strings for others( Ex: date)
 
-        with open("userleaderboard.txt", "r", encoding='utf-8') as filename:
+        with open(file_input, "r", encoding='utf-8') as filename:
 
             listofstuff = filename.readlines()
             allstats = []
@@ -405,7 +405,7 @@ class username_best_replay:
             file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
 
             # Searches if there is a new least blocks
-            currentpageblocks = page_replay_stats.page_200_replays_stats(0)
+            currentpageblocks = page_replay_stats.page_200_replays_stats('userleaderboard.txt')
             c = 0
             for i in currentpageblocks:
                 if minblocks > i[1]:
@@ -450,7 +450,7 @@ class username_best_replay:
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
-            currentpageblocks = page_replay_stats.page_200_replays_stats(0)
+            currentpageblocks = page_replay_stats.page_200_replays_stats('userleaderboard.txt')
             for i in currentpageblocks:
                 if int(int(lines[:-1]) * 2.5) == i[1]:
                     pcsprint = i
@@ -486,7 +486,7 @@ class username_best_replay:
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
-            currentpageppb = page_replay_stats.ultra_page_200_replays_stats(0)
+            currentpageppb = page_replay_stats.ultra_page_200_replays_stats('userleaderboard.txt')
             for i in currentpageppb:
                 if i[2] > maxppb:
                     print(i)
