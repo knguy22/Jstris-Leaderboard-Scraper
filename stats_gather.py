@@ -373,30 +373,8 @@ class username_best_replay:
         current_last_replay = "0"
         minblocks = 10 ** 20
 
-        # converts game and mode to their respective strings to search in url
-        if game == "1":
-            gamemode = "sprint"
-            if mode == "2":
-                lines = "20L"
-            elif mode == "1":
-                lines = "40L"
-            elif mode == "3":
-                lines = "100L"
-            elif mode == "4":
-                lines = "1000L"
-            else:
-                "invalid mode"
-                return -69
-        elif game == "3":
-            gamemode = "cheese"
-            if mode == "1":
-                lines = "10L"
-            elif mode == "2":
-                lines = "18L"
-            elif mode == "3":
-                lines = "100L"
-            else:
-                raise "invalid mode"
+        gamemode = username_best_replay.game_to_string(game)
+        lines = username_best_replay.mode_to_string(game, mode)
 
         while 1 == 1:
 
@@ -427,19 +405,8 @@ class username_best_replay:
         pcsprint = False
 
         # converts game and mode to their respective strings to search in url
-        if game == "1":
-            gamemode = "sprint"
-            if mode == "2":
-                lines = "20L"
-            elif mode == "1":
-                lines = "40L"
-            elif mode == "3":
-                lines = "100L"
-            elif mode == "4":
-                lines = "1000L"
-            else:
-                "invalid mode"
-                return -69
+        gamemode = username_best_replay.game_to_string(game)
+        lines = username_best_replay.mode_to_string(game, mode)
 
         while 1 == 1:
 
@@ -474,8 +441,7 @@ class username_best_replay:
 
         # converts game and mode to their respective strings to search in url
 
-        if game == "5":
-            gamemode = "ultra"
+        gamemode = username_best_replay.game_to_string(game)
 
         while 1 == 1:
 
@@ -501,6 +467,41 @@ class username_best_replay:
             current_last_replay = str(last_time_in_page(game))
 
         return maxstats
+
+    def game_to_string(game):
+        if game == '1':
+            return 'sprint'
+        elif game == '3':
+            return 'cheese'
+        elif game == '5':
+            return 'ultra'
+        else:
+            raise 'not valid game'
+
+    def mode_to_string(game, mode):
+        if game == "1":
+            if mode == "2":
+                lines = "20L"
+            elif mode == "1":
+                lines = "40L"
+            elif mode == "3":
+                lines = "100L"
+            elif mode == "4":
+                lines = "1000L"
+            else:
+                raise 'invalid mode'
+        elif game == "3":
+            if mode == "1":
+                lines = "10L"
+            elif mode == "2":
+                lines = "18L"
+            elif mode == "3":
+                lines = "100L"
+            else:
+                raise 'invalid mode'
+
+        return lines
+
 
 # Write user's final pb or replay and corresponding stats to unorderedstats.txt
 def write_finalstats_to_file(username, currentstats, game):
