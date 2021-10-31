@@ -1,6 +1,6 @@
 import io
 from datetime import date
-import stats_interpreter
+from stats_interpreter import my_stats
 
 # stats_sorter takes "unorderedstats.txt" and sorts each username for blocks ascending from lowest blocks (ascend
 # from lowest time if blocks are equal);
@@ -45,17 +45,10 @@ def stats_string_to_blocks(listofusernames):
     # extract least block runs, index, and pps in list from each username's string; assigns them to tuple
     # use least blocks and pps to sort later
 
-    # string format:
-    # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
-
     c = 0
     listofblockruns = []
     for i in listofusernames:
-        timeindex = i.index("Time: ")
-        blocksindex = i.index("Blocks: ")
-        ppsindex = i.index("PPS: ")
-        listofblockruns.append((int(i[blocksindex + 8: ppsindex - 2]),
-                                stats_interpreter.clock_to_seconds(i[timeindex + 6: blocksindex - 2]), c))
+        listofblockruns.append((my_stats.unordered_block(i), my_stats.unordered_clock_to_seconds(i), c))
         c += 1
 
     return listofblockruns
@@ -89,7 +82,8 @@ def least_blocks_sorting_algorithm(listofblockruns):
             d += 1
 
         iterations += 1
-        print(iterations)
+        if iterations % 10000 == 0:
+            print(iterations)
 
     return listofblockruns
 
@@ -104,9 +98,7 @@ def stats_string_to_pc_sprint(listofusernames):
     listofpcruns = []
     for i in listofusernames:
         if ("No valid run" in i) == False:
-            timeindex = i.index("Time: ")
-            blocksindex = i.index("Blocks: ")
-            listofpcruns.append((stats_interpreter.clock_to_seconds(i[timeindex + 6: blocksindex - 2]), c))
+            listofpcruns.append((my_stats.unordered_clock_to_seconds(i), c))
         c += 1
 
     return listofpcruns
