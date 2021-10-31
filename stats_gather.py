@@ -481,26 +481,27 @@ class username_best_replay:
     def mode_to_string(game, mode):
         if game == "1":
             if mode == "2":
-                lines = "20L"
+                return "20L"
             elif mode == "1":
-                lines = "40L"
+                return "40L"
             elif mode == "3":
-                lines = "100L"
+                return "100L"
             elif mode == "4":
-                lines = "1000L"
+                return "1000L"
             else:
                 raise 'invalid mode'
         elif game == "3":
             if mode == "1":
-                lines = "10L"
+                return "10L"
             elif mode == "2":
-                lines = "18L"
+                return "18L"
             elif mode == "3":
-                lines = "100L"
+                return "100L"
             else:
                 raise 'invalid mode'
+        else:
+            raise 'invalid game'
 
-        return lines
 
 
 # Write user's final pb or replay and corresponding stats to unorderedstats.txt
