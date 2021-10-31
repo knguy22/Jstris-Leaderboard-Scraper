@@ -99,8 +99,7 @@ class jstris_stats:
     def blocks(blocksstring):
         # example line
         # <td>236</td>
-        if blocksstring[0] == " ":
-            blocksstring = blocksstring[1:]
+
         blockstringend = blocksstring.rindex("</td>")
         blocksstring = int(blocksstring[4:blockstringend])
         return blocksstring
@@ -108,8 +107,7 @@ class jstris_stats:
     def pps(ppsstring):
         # example line
         # <td>0.08</td>
-        if ppsstring[0] == " ":
-            ppsstring = ppsstring[1:]
+
         ppsstringend = ppsstring.rindex("</td>")
         ppsstring = float(ppsstring[4:ppsstringend])
         ppsstring = round(ppsstring, 2)
@@ -118,8 +116,7 @@ class jstris_stats:
     def finesse(finessestring):
         # example line
         # <td>48</td>
-        if finessestring[0] == " ":
-            finessestring = finessestring[1:]
+
         finessestringend = finessestring.rindex("</td>")
         finessestring = int(finessestring[4:finessestringend])
         return finessestring
@@ -127,8 +124,7 @@ class jstris_stats:
     def date(datestring):
         # example
         # <td>2020-08-11 18:06:53</td>
-        if datestring[0] == " ":
-            datestring = datestring[1:]
+
         datestringend = datestring.rindex("</td>")
         datestring = datestring[4:datestringend]
         return datestring
@@ -136,6 +132,7 @@ class jstris_stats:
     def link(linkstring):
         # example
         # <a href="https://jstris.jezevec10.com/replay/19483494" target="_blank">(V3)<img src="https://jstris.jezevec10.com/res/play.png"></a>
+
         if "https://jstris.jezevec10.com/replay/" in linkstring:
             linkstringend = linkstring.index("target") - 2
             linkstring = linkstring[9:linkstringend]
@@ -156,8 +153,6 @@ class jstris_stats:
         # example
         # <td>379.15</td>
 
-        if ppbstring[0] == " ":
-            ppbstring = ppbstring[1:]
         ppbstringend = ppbstring.rindex("</td>")
         ppbstring = float(ppbstring[4:ppbstringend])
         ppbstring = round(ppbstring, 2)
