@@ -9,8 +9,12 @@ import os
 # finds desired replay from each user with the replay's corresponding stats and link
 # all of these things are stored in "unorderedstats.txt"
 
+
+# used for forming leaderboards where each player only has one replay
 def indiv_player_stats_gather(listofusernames, game, mode):
     # gathers unordered stats of everyone; saves it for later in unorderedstats.txt
+
+
 
     # checks how much of the stats have been gathered so far; this program is meant to be stopped and run again in
     # accordance to the user's schedule; all stats scraped so far has been saved
@@ -26,7 +30,7 @@ def indiv_player_stats_gather(listofusernames, game, mode):
     while len(listofusernames) - currentindex > 0:
         print(currentindex + 1, listofusernames[currentindex])
 
-        # format for each player:
+        # format for each player assigned to currentstats:
         # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
 
         if game == "1":
@@ -36,10 +40,9 @@ def indiv_player_stats_gather(listofusernames, game, mode):
         elif game == "5":
             currentstats = username_best_replay.username_ultra_ppb(listofusernames[currentindex], game)
             
-        write_finalstats_to_file(listofusernames[currentindex], currentstats, game)
+        write_finalstats_to_file(currentstats, game)
 
         currentindex += 1
-        time.sleep(3)
 
 # sorts for all games in general (supports least blocks so far)
 def all_games_stats_gather(listofusernames, game, mode):
@@ -68,9 +71,8 @@ def all_games_stats_gather(listofusernames, game, mode):
             write_finalstats_to_file(listofusernames[currentindex], i, game)
 
         currentindex += 1
-        time.sleep(3)
 
-    # file_stuff.duplicate_deleter()
+    file_stuff.duplicate_deleter('unorderedstats.txt')
 
 # Get time value of last replay in page
 def last_time_in_page(game):
@@ -149,6 +151,7 @@ def check_200_replays():
 
 class file_stuff:
     def username_leaderboard_file(url, file_output):
+        time.sleep(2)
         # userleaderboard.txt is how all of the page's data will be stored
         r = requests.get(url)
         with open(file_output, "w", encoding="utf-8") as filename:
@@ -186,20 +189,16 @@ class file_stuff:
             f = open("newstats.txt", 'x')
             f.close()
 
-        previous_replay = ''
-        non_duplicate_list = []
-        with open(file_input, 'r', encoding='utf-8') as filename:
-            c = 0
-            while len(filename) - c > 0:
-                current_replay = filename.readline()
-                if current_replay != previous_replay:
-                    non_duplicate_list.append(current_replay)
-                if len(non_duplicate_list) == 10000:
-                    with open("newstats.txt", 'a', encoding='utf-8') as filename:
-                        filename.writelines(non_duplicate_list)
-                        non_duplicate_list = []
-                previous_replay = current_replay
-                c += 1
+        with open(file_input, 'r', encoding = 'utf-8') as f:
+            stuff = f.readlines()
+            new_stuff = []
+            previous_line = 0
+            for line in stuff:
+                if line != previous_line:
+                    new_stuff.append(line)
+                previous_line = line
+            with open('newstats.txt', 'a', encoding='utf-8') as g:
+                g.writelines(new_stuff)
 
         os.remove(file_input)
         os.rename('newstats.txt', file_input)
@@ -239,7 +238,6 @@ class page_replay_stats:
             #gets next page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
             file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
-            time.sleep(3)
 
             # adds current page replays to list of all other replays so far
             allpagesstats.extend(page_replay_stats.page_200_replays_stats('userleaderboard.txt'))
@@ -286,6 +284,9 @@ class page_replay_stats:
             while len(listofstuff) - c > 0:
 
                 if "<td><strong>" in listofstuff[c]:
+                    currentusername = listofstuff[c-2]
+                    currentusername = jstris_stats.username(currentusername)
+
                     currenttime = listofstuff[c]
                     currenttime = jstris_stats.jstris_time(currenttime)
 
@@ -305,7 +306,7 @@ class page_replay_stats:
                     currentlink = jstris_stats.link(currentlink)
 
                     allstats.append(
-                        (currenttime, currentblock, currentpps, currentfinesse, currentdate, currentlink))
+                        (currentusername, currenttime, currentblock, currentpps, currentfinesse, currentdate, currentlink))
                 c += 1
 
         return allstats
@@ -338,6 +339,9 @@ class page_replay_stats:
             while len(listofstuff) - c > 0:
 
                 if "<td><strong>" in listofstuff[c]:
+                    currentusername = listofstuff[c-2]
+                    currentusername = jstris_stats.username(currentusername)
+
                     currentscore = listofstuff[c]
                     currentscore = jstris_stats.jstris_score(currentscore)
 
@@ -360,7 +364,7 @@ class page_replay_stats:
                     currentlink = jstris_stats.link(currentlink)
 
                     allstats.append(
-                        (currentscore, currentblock, currentppb , currentpps, currentfinesse, currentdate, currentlink))
+                        (currentusername,currentscore, currentblock, currentppb , currentpps, currentfinesse, currentdate, currentlink))
                 c += 1
 
         return allstats
@@ -379,15 +383,15 @@ class username_best_replay:
         while 1 == 1:
 
             # gets next cheese page
-            url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
+            url = "https://jstris.jezevec10.com/{}?display=5&user={}&lines={}&page={}".format(gamemode, username, lines, current_last_replay)
             file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
 
             # Searches if there is a new least blocks
             currentpageblocks = page_replay_stats.page_200_replays_stats('userleaderboard.txt')
             c = 0
             for i in currentpageblocks:
-                if minblocks > i[1]:
-                    minblocks = i[1]
+                if minblocks > i[2]:
+                    minblocks = i[2]
                     minstats = i
                 c += 1
 
@@ -411,15 +415,15 @@ class username_best_replay:
         while 1 == 1:
 
             # gets next page
-            url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&lines=" + lines + "&page=" + current_last_replay
+            url = "https://jstris.jezevec10.com/{}?display=5&user={}&lines={}&page={}".format(gamemode, username, lines, current_last_replay)
+
             file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
-            time.sleep(3)
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
             currentpageblocks = page_replay_stats.page_200_replays_stats('userleaderboard.txt')
             for i in currentpageblocks:
-                if int(int(lines[:-1]) * 2.5) == i[1]:
+                if int(int(lines[:-1]) * 2.5) == i[2]:
                     pcsprint = i
                     print("True:", pcsprint)
                     return pcsprint
@@ -447,8 +451,9 @@ class username_best_replay:
 
             # gets current page
             url = "https://jstris.jezevec10.com/" + gamemode + "?display=5&user=" + username + "&page=" + current_last_replay
+            url = "https://jstris.jezevec10.com/{}?display=5&user={}&page={}".format(gamemode, username, current_last_replay)
+
             file_stuff.username_leaderboard_file(url, 'userleaderboard.txt')
-            time.sleep(3)
 
             # scrapes stats from current page
             # difference between this and username_least_blocks is that this breaks right away when a pc finish is found
@@ -456,7 +461,7 @@ class username_best_replay:
             for i in currentpageppb:
                 if i[2] > maxppb:
                     print(i)
-                    maxppb = i[2]
+                    maxppb = i[3]
                     maxstats = i
 
             # checks if there are no pages left
@@ -505,34 +510,29 @@ class username_best_replay:
 
 
 # Write user's final pb or replay and corresponding stats to unorderedstats.txt
-def write_finalstats_to_file(username, currentstats, game):
+def write_finalstats_to_file(currentstats, game):
     if game != "5":
         with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
             if type(currentstats) != bool:
-                filename.write(username + "  ")
-                filename.write("Time: " + jstris_stats.seconds_to_clock(currentstats[0]) + "  ")
-                filename.write("Blocks: " + str(currentstats[1]) + "  ")
-                filename.write("PPS: " + str(currentstats[2]) + "  ")
-                filename.write("Finesse: " + str(currentstats[3]) + "  ")
-                filename.write("Date: " + currentstats[4] + "  ")
-                filename.write("Link: " + currentstats[5] + " \n")
+                filename.write(my_stats.tuple_to_statsstring(currentstats))
             elif type(currentstats) == bool:
                 filename.write("No valid run;\n")
             else:
                 raise "error"
 
-    elif game == "5":
-        with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
-            if type(currentstats) != bool:
-                filename.write(username + "  ")
-                filename.write("Time: " + jstris_stats.clock_to_seconds(str(currentstats[0]) + "  "))
-                filename.write("Blocks: " + str(currentstats[1]) + "  ")
-                filename.write("PPS: " + str(currentstats[2]) + "  ")
-                filename.write("Finesse: " + str(currentstats[3]) + "  ")
-                filename.write("Date: " + currentstats[4] + "  ")
-                filename.write("Link: " + currentstats[5] + " \n")
-            elif type(currentstats) == bool:
-                filename.write("No valid run;\n")
-            else:
-                raise "error"
+    # fix me; actually make this compatible with ultra
+    # elif game == "5":
+    #     with open("unorderedstats.txt", "a", encoding="UTF-8") as filename:
+    #         if type(currentstats) != bool:
+    #             filename.write(username + "  ")
+    #             filename.write("Time: " + jstris_stats.clock_to_seconds(str(currentstats[0]) + "  "))
+    #             filename.write("Blocks: " + str(currentstats[1]) + "  ")
+    #             filename.write("PPS: " + str(currentstats[2]) + "  ")
+    #             filename.write("Finesse: " + str(currentstats[3]) + "  ")
+    #             filename.write("Date: " + currentstats[4] + "  ")
+    #             filename.write("Link: " + currentstats[5] + " \n")
+    #         elif type(currentstats) == bool:
+    #             filename.write("No valid run;\n")
+    #         else:
+    #             raise "error"
 

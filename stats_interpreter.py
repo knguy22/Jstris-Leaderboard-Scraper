@@ -3,6 +3,14 @@
 #Everything below will return an integer/float except for the date, link and timestring, which return a string
 
 class jstris_stats:
+
+    def username(usernamestring):
+        # format
+        # streasure</a>
+        endindex = usernamestring.index("</a>")
+        usernamestring = usernamestring[ : endindex]
+        return usernamestring
+
     # jstris time format to seconds
     def jstris_time(timestring):
 
@@ -159,7 +167,9 @@ class jstris_stats:
         return ppbstring
 
 
+
 # Deals with all my formatting nonsense in unorderedstats.txt
+# Does not support ultra runs and other stuff yet
 
 class my_stats:
 
@@ -199,7 +209,7 @@ class my_stats:
 
         ppsindex = statstring.index("PPS: ")
         finesseindex = statstring.index("Finesse: ")
-        final_pps = int(statstring[ppsindex + 5: finesseindex - 2])
+        final_pps = float(statstring[ppsindex + 5: finesseindex - 2])
 
         return final_pps
 
@@ -228,10 +238,29 @@ class my_stats:
         # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
 
         linkindex = statstring.index("Link: ")
-        endindex = -1
-        final_link = statstring[linkindex + 6: endindex]
+        final_link = statstring[linkindex + 6: ]
 
         return final_link
 
     def unordered_clock_to_seconds(timestring):
         return jstris_stats.clock_to_seconds(my_stats.unordered_time(timestring))
+
+    def statsstring_to_tuple(statsstring):
+        # format
+        # Vince_HD  Time: 1:43.365  Blocks: 240  PPS: 2.32  Finesse: 9  Date: 2020-03-12 08:27:26  Link: https://jstris.jezevec10.com/replay/12611720
+        return (my_stats.unordered_username(statsstring),
+                my_stats.unordered_time(statsstring),
+                my_stats.unordered_block(statsstring),
+                my_stats.unordered_pps(statsstring),
+                my_stats.unordered_finesse(statsstring),
+                my_stats.unordered_date(statsstring),
+                my_stats.unordered_link(statsstring))
+
+    def tuple_to_statsstring(t):
+        time = t[1]
+        try:
+            time = jstris_stats.seconds_to_clock(t[1])
+        except:
+            pass
+        return "{}  Time: {}  Blocks: {}  PPS: {}  Finesse: {}  Date: {}  Link: {} \n".format(  t[0], time, t[2], t[3],
+                                                                                             t[4], t[5], t[6])
