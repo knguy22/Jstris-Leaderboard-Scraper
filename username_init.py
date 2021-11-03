@@ -5,30 +5,41 @@ import os
 # username_init checks if we want to scrape the jstris api leaderboards and outputs a list of usernames
 # the usernames are stored in "unorderedname.txt"
 
-def username_init(game, mode):
+def username_init(game, mode, filename):
     # Checking if the username file is empty
 
     conditiongetusernames = False
 
-    if os.path.exists("unorderedname.txt") == False:
-        f = open("unorderedname.txt", 'x')
+    if os.path.exists(filename) == False:
+        f = open(filename, 'x')
         f.close()
 
-    with open("unorderedname.txt", "r") as filename:
-        listofusernames = filename.readlines()
+    with open(filename, "r", encoding='utf-8') as f:
+        listofusernames = f.readlines()
         if len(listofusernames) < 1:
             conditiongetusernames = True
 
     # gather usernames from jstris api if unorderedname.txt is empty
     # if already have usernames, gather usernames from unorderedname.txt
-
     if conditiongetusernames == True:
         listofusernames = all_names_leaderboards(game=game, mode=mode)
-        with open("unorderedname.txt", "w") as filename:
-            filename.writelines(listofusernames)
+        with open(filename, "w", encoding='utf-8') as f:
+            f.writelines(listofusernames)
     else:
-        with open("unorderedname.txt", "r") as filename:
-            listofusernames = filename.readlines()
+        with open(filename, "r") as f:
+            listofusernames = f.readlines()
+
+    # convert usernames back into unicode
+
+    with io.open(filename, 'rb') as f:
+        stringofusernames = f.read()
+    stringofusernames = stringofusernames.decode("unicode_escape")
+    listofusernames = stringofusernames.split('\n')
+    c = 0
+    # you need this to prevent the \r at the end of each name
+    while len(listofusernames) > c:
+        listofusernames[c] = listofusernames[c][:-1]
+        c += 1
 
     return listofusernames
 
