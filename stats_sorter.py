@@ -22,7 +22,7 @@ def stats_sorter(game):
     # sorts by pc sprint finish
     elif game == "1":
         listofruns = stats_string_to_runs(listofusernames)
-        listofruns = sorted(listofruns, key=operator.itemgetter(2))
+        listofruns = sorted(listofruns, key=operator.itemgetter(1))
 
     # prepares list of stats from unorderedstatstxt using sorted listofblockruns and writes unorderedstats into
     # orderedstats.txt
@@ -46,7 +46,8 @@ def stats_string_to_runs(listofusernames):
 
     listofblockruns = []
     for i in listofusernames:
-        listofblockruns.append(my_stats.statsstring_to_tuple(i))
+        if i != "No valid run;":
+            listofblockruns.append(my_stats.statsstring_to_tuple(i))
 
     return listofblockruns
 
@@ -62,17 +63,8 @@ def write_stats_to_file(listofblockruns, listofusernames, usecsv):
 
     sortedlistofusernames = statsformattocsv(sortedlistofusernames, usecsv)
 
-
-    # encode for text
-
-    c = 0
-    while len(sortedlistofusernames) - c > 0:
-        sortedlistofusernames[c] = sortedlistofusernames[c].encode("utf8")
-        c += 1
-
-
     # write text to final document
-    with open("orderedstats.csv", "wb") as f:
+    with open("orderedstats.csv", "w", encoding='utf-8') as f:
         f.writelines(sortedlistofusernames)
 
 def statsformattocsv(sortedlistofusernames, usecsv):

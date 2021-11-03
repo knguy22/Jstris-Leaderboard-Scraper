@@ -23,7 +23,7 @@ def indiv_player_stats_gather(listofusernames, game, mode):
         f = open("unorderedstats.txt", 'x')
         f.close()
 
-    with open("unorderedstats.txt", "r") as filename:
+    with open("unorderedstats.txt", "r", encoding='utf-8') as filename:
         listofstats = filename.readlines()
         currentindex = len(listofstats)
 
@@ -51,7 +51,7 @@ def all_games_stats_gather(listofusernames, game, mode):
         f = open("unorderedstats.txt", 'x')
         f.close()
 
-    with open("unorderedstats.txt", "r") as filename:
+    with open("unorderedstats.txt", "r", encoding='utf-8') as filename:
         for line in filename:
             pass
         lastusername = my_stats.unordered_username(line)
