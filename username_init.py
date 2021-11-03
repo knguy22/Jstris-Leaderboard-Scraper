@@ -46,43 +46,20 @@ def username_init(game, mode):
 
 # Uses jstris api to grab all usernames on public leaderboards of a specific gamemode
 def all_names_leaderboards(game, mode):
-    currentfirstposition = -500
+    num_usernames = 500
     nextfirstposition = 0
     listofusernames = []
 
-    while nextfirstposition == currentfirstposition + 500:
+    while num_usernames == 500:
 
-        leaderboards_file(game=game, mode=mode, offset=str(nextfirstposition), writeorappend="w")
-        currentfirstposition = nextfirstposition
-
-        with open("leaderboard.txt", "r") as filename:
-            c = 0
-
-            # jstris api only returns a single line containing all 500 usernames
-            listofstuff = filename.readline()
-
-            # checks last username position; if last username's index is less than 500, there are no more usernames
-            # left after this page; the while statement will check
-
-            # example format from jstris api
-            # [{"id":36350620,"pos":1,"game":61.454,"ts":"2021-06-15 15:55:03","name":"qwerty"},
-
-            lastpos = listofstuff.rindex('"pos"')
-            lastgame = listofstuff.rindex('"game"')
-            nextfirstposition = int(listofstuff[lastpos + 6: lastgame - 1])
-            print(nextfirstposition)
-
-            # scrapes the usernames
-
-            while len(listofstuff) > 1:
-                endbracket = listofstuff.index('}')
-                begusername = listofstuff.index('name')
-                listofusernames.append(listofstuff[begusername + 7: endbracket - 1] + '\n')
-                listofstuff = listofstuff[endbracket + 2:]
+        curr_usernames = leaderboards_to_usernames(game=game, mode=mode, offset=str(nextfirstposition), writeorappend="w")
+        num_usernames = len(curr_usernames)
+        listofusernames.extend(curr_usernames)
+        nextfirstposition += 500
 
     return listofusernames
 
-def leaderboards_file(game, mode, offset, writeorappend):
+def leaderboards_to_usernames(game, mode, offset = "0", writeorappend = 'w'):
     # game:
     # 1 = sprint, 3 = cheese, 4 = survival, 5 = ultra
 
@@ -96,8 +73,9 @@ def leaderboards_file(game, mode, offset, writeorappend):
     url = "https://jstris.jezevec10.com/api/leaderboard/" + game + "?mode=" + mode + "&offset=" + offset
 
     response = requests.get(url)
-    data = response.text.encode().decode()
+    data = response.json()
+    names_list = []
+    for i in data:
+        names_list.append(i['name'] + "\n")
 
-    filename = open("leaderboard.txt", writeorappend)
-    filename.write(data + "\n")
-    filename.close()
+    return names_list
