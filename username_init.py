@@ -30,18 +30,6 @@ def username_init(game, mode):
         with open("unorderedname.txt", "r") as filename:
             listofusernames = filename.readlines()
 
-    # convert usernames back into unicode
-
-    with io.open("unorderedname.txt", 'rb') as f:
-        stringofusernames = f.read()
-    stringofusernames = stringofusernames.decode("unicode_escape")
-    listofusernames = stringofusernames.split('\n')
-    c = 0
-    # you need this to prevent the \r at the end of each name
-    while len(listofusernames) > c:
-        listofusernames[c] = listofusernames[c][:-1]
-        c += 1
-
     return listofusernames
 
 # Uses jstris api to grab all usernames on public leaderboards of a specific gamemode
