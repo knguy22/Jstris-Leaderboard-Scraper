@@ -41,6 +41,7 @@ def username_init(game, mode, filename):
         listofusernames[c] = listofusernames[c][:-1]
         c += 1
 
+
     return listofusernames
 
 # Uses jstris api to grab all usernames on public leaderboards of a specific gamemode
